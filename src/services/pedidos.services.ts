@@ -1,7 +1,6 @@
 import { pool } from "../database/conexion";
 import { PedidosDto } from "../dto/pedido.dto";
 import { UpdateProductoDto } from "../dto/producto.dto";
-import { EstadoPedido } from "../enums/estado-pedido.enum";
 import { Pedido } from "../models/pedidos.interface";
 import { ItemsPedidosServices } from "./items-pedidos.services";
 import { ProductosServices } from "./productos.services";
@@ -41,12 +40,12 @@ export class PedidosServices {
         )
 
         // CREAR ORDEN DEL PEDIDO
-        const query = `INSERT INTO public.pedidos (usuario_id, estado, total_pedido, reccion_envio)
+        const query = `INSERT INTO public.pedidos (usuario_id, estado, total_pedido, direccion_envio)
         VALUES ($1, $2, $3, $4) RETURNING *;`
 
         const values = [usuario_id, estado, total_pedido, direccion_envio]
 
-        const result = await pool.query(query, [values])
+        const result = await pool.query(query, values)
 
         // CREAR ITEMS DE LA ORDEN ASOCIADA AL PRODUCTO
         await Promise.all(
@@ -64,16 +63,16 @@ export class PedidosServices {
                 let valuesItems = {
                     pedido_id: result.rows[0].id,
                     producto_id: producto.id,
-                    cantidad_pedido: item.cantidad
+                    cantidad_pedido: item.cantidad = item.cantidad
                 };
 
                 const queryItems = await this.itemsPedidosServices.crearItemsPedidos(valuesItems)
 
                 const productoActualizado: UpdateProductoDto = {
                     ...producto,
-                    cantidad: producto.stock - cantidad,
+                    cantidad: Number(producto.cantidad) - Number(cantidad),
                 };
-                
+                console.log('producto act',productoActualizado)
                 await this.productosServices.actualizarProducto(String(fk_producto), productoActualizado)
 
                 return queryItems

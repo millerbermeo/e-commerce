@@ -9,7 +9,7 @@ export class ItemsPedidosServices {
 
         const { pedido_id, producto_id, cantidad_pedido } = dto
 
-        const query = `INSERT INTO public.items-pedidos (pedido_id, producto_id, cantida_pedido)
+        const query = `INSERT INTO public.items_pedidos (pedido_id, producto_id, cantidad_pedido)
         VALUES ($1, $2, $3) RETURNING *;`
 
         const values = [pedido_id, producto_id, cantidad_pedido]

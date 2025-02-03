@@ -5,15 +5,15 @@ import { Producto } from "../models/productos.interface";
 export class ProductosServices {
 
     async crearProducto(dto: CreateProductoDto): Promise<Producto> {
-        const { nombre, descripcion, cantidad, categoria_id, imagen } = dto
+        const { nombre, descripcion, cantidad, precio,categoria_id, imagen } = dto
 
         const query = `
-              INSERT INTO public.productos (nombre, descripcion, cantidad, categoria_id, imagen)
-              VALUES ($1, $2, $3, $4, $5)
+              INSERT INTO public.productos (nombre, descripcion, precio, cantidad, categoria_id, imagen)
+              VALUES ($1, $2, $3, $4, $5, $6)
               RETURNING *;
           `;
 
-        const values = [nombre, descripcion, cantidad, categoria_id, imagen];
+        const values = [nombre, descripcion, precio, cantidad, categoria_id, imagen];
         const result = await pool.query(query, values);
         return result.rows[0];
     }
@@ -32,17 +32,34 @@ export class ProductosServices {
 
     async actualizarProducto(id: string, dto: UpdateProductoDto): Promise<Producto> {
 
+        const { nombre, descripcion, precio, cantidad, categoria_id, imagen } = dto
+
+
         const producto = await this.obtenerProducto(id)
 
         if (!producto) {
             throw new Error(`El producto con ID ${id} no existe`);
         }
 
-        const { nombre, descripcion, cantidad, categoria_id, imagen } = dto
+        if (precio !== undefined && (isNaN(Number(precio)) || precio < 0)) {
+            throw new Error("Error: El precio no es un número válido.");
+        }
+        
+        if (cantidad !== undefined && (isNaN(Number(cantidad)) || cantidad < 0)) {
+            throw new Error("Error: La cantidad no es un número válido.");
+        }
+    
+        if (categoria_id !== undefined && isNaN(Number(categoria_id))) {
+            throw new Error("Error: categoria_id no es un número válido.");
+        }
+    
 
-        const query = `UPDATE FROM public.productos SET nombre = $1, descripcion = $2, cantidad = $3, $categoria_id = $4, imagen = $5 RETURNING *;`
-        const values = [nombre, descripcion, cantidad, categoria_id, imagen];
+
+        const query = `UPDATE public.productos SET nombre = $1, descripcion = $2, precio = $3, cantidad = $4, categoria_id = $5, imagen = $6 WHERE id = $7 RETURNING *;`
+        const values = [nombre, descripcion, precio, cantidad, categoria_id, imagen, id];
         const result = await pool.query(query, values);
+        console.log('reualtado',result)
+
         return result.rows[0];
     }
 

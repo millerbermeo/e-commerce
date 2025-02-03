@@ -3,7 +3,7 @@ export interface Producto {
     nombre: string
     descripcion: string
     precio: number
-    stock: number
+    cantidad: number
     categoria_id: number
     imagen: string
 }

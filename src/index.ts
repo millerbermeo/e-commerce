@@ -1,9 +1,13 @@
 import express, { Response } from "express";
 import cors from 'cors';
 import { pool } from "./database/conexion";
+import { authenticate } from "./middlewares/auth.middleware";
+
 import rutaUsuarios from './routes/usuario.routes';
 import authRouter from "./routes/auth.routes";
-import { authenticate } from "./middlewares/auth.middleware";
+import rutaProductos from './routes/productos.routes';
+import rutaPedidos from './routes/pedidos.routes';
+
 
 const app = express();
 const port = 3000;
@@ -24,6 +28,9 @@ app.use(authenticate);
 
 // Rutas protegidas (requieren autenticación)
 app.use('/api/usuarios', rutaUsuarios);
+app.use('/api/productos', rutaProductos);
+app.use('/api/pedidos', rutaPedidos);
+
 
 (async () => {
   try {
