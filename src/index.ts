@@ -1,16 +1,21 @@
-import express, {Response} from "express"
+import express, { Response } from "express"
+import cors from 'cors'
 import { pool } from "./database/conexion";
-import rutaUsuarios from './routes/usuario.router'
+import rutaUsuarios from './routes/usuario.routes'
+import authRouter from "./routes/auth.routes";
+import { authenticate } from "./middlewares/auth.middleware";
 
 const app = express();
 const port = 3000;
-
-app.use(express.json());
 
 // Ruta de prueba
 app.get('/', (_, res: Response) => {
   res.send('¡Hola Mundo desde Express!');
 });
+
+app.use(cors());  // Para permitir CORS si es necesario
+app.use(express.json());
+app.use('/api', authenticate);
 
 (async () => {
   try {
@@ -22,7 +27,7 @@ app.get('/', (_, res: Response) => {
 })();
 
 app.use('/usuarios', rutaUsuarios)
-
+app.use("/auth", authRouter);
 
 // Iniciar el servidor
 app.listen(port, () => {
