@@ -3,12 +3,13 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET = String(process.env.JWT_SECRET);
 
 export function authenticate(req: Request, res: Response, next: NextFunction): void {
 
     try {
         const token = String(req.header("Authorization")?.split(" ")[1]);  // Obtenemos el token del encabezado
+console.log(token)
 
         if (!token) {
             res.status(401).json({ message: "Acceso denegado. No se proporcionó token." });

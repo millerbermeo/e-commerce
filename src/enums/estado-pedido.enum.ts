@@ -1,7 +1,6 @@
 export enum EstadoPedido {
     pendiente = 'pendiente',
-    pagado = 'pagado',
-    en_envío = 'en_envío',
-    entregado = 'entregado',
+    en_envío = 'en_envio',
+    completado = 'completado',
     cancelado = 'cancelado'
 }

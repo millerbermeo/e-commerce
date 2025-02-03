@@ -5,8 +5,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const JWT_SECRET = String(process.env.JWT_SECRET || "15msasaaaaa");
-const JWT_REFRESH_SECRET = String(process.env.JWT_REFRESH_SECRET || "saaaaaaaaa");
+const JWT_SECRET = String(process.env.JWT_SECRET);
+const JWT_REFRESH_SECRET = String(process.env.JWT_REFRESH_SECRET);
 
 
 export async function register(correo: string, password: string) {

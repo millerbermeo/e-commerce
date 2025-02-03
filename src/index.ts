@@ -1,7 +1,7 @@
-import express, { Response } from "express"
-import cors from 'cors'
+import express, { Response } from "express";
+import cors from 'cors';
 import { pool } from "./database/conexion";
-import rutaUsuarios from './routes/usuario.routes'
+import rutaUsuarios from './routes/usuario.routes';
 import authRouter from "./routes/auth.routes";
 import { authenticate } from "./middlewares/auth.middleware";
 
@@ -13,21 +13,26 @@ app.get('/', (_, res: Response) => {
   res.send('¡Hola Mundo desde Express!');
 });
 
-app.use(cors());  // Para permitir CORS si es necesario
+app.use(cors());
 app.use(express.json());
-app.use('/api', authenticate);
+
+// Rutas públicas (sin autenticación)
+app.use("/auth", authRouter);
+
+// Middleware de autenticación (se aplica a todas las rutas después de esta línea)
+app.use(authenticate);
+
+// Rutas protegidas (requieren autenticación)
+app.use('/api/usuarios', rutaUsuarios);
 
 (async () => {
   try {
     await pool.query("SELECT 1");
-    console.log("conexión establecida");
+    console.log("Conexión establecida");
   } catch (error) {
-    console.error("error de conexión: ", error);
+    console.error("Error de conexión: ", error);
   }
 })();
-
-app.use('/usuarios', rutaUsuarios)
-app.use("/auth", authRouter);
 
 // Iniciar el servidor
 app.listen(port, () => {
