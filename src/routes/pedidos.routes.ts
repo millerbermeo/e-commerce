@@ -9,7 +9,7 @@ const route = Router()
 
 route.get('/', pedidosController.listarPedidos)
 route.post('/', validateDto(PedidosDto), pedidosController.crearOrdenPedido);
-route.patch('/', validateDto(UpdatePedidosDto), pedidosController.actualizarPedidos);
+route.put('/:id', validateDto(UpdatePedidosDto), pedidosController.actualizarPedidos);
 
 
 export default route

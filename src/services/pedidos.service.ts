@@ -126,22 +126,26 @@ export class PedidosServices {
 
 
     async actualizarPedido(id: string, dto: UpdatePedidosDto): Promise<Pedido> {
-
-        const { usuario_id, estado, direccion_envio } = dto;
-
-        const pedido = await this.obtenerPedido(id)
-
+        const pedido = await this.obtenerPedido(id);
+    
         if (!pedido) {
             throw new Error(`El pedido con ID ${id} no existe`);
         }
-
-        const query = `UPDATE FROM public.pedidos SET usuario_id = $1, estado = $2, direccion_envio = $3
-        WHERE id = $4`
-
-        const values = [usuario_id, estado, direccion_envio, id]
-
-        const result = await pool.query(query, values)
-
-        return result.rows[0]
+    
+        // Mantener los valores actuales si no vienen en el DTO
+        const usuario_id = dto.usuario_id ?? pedido.cliente;
+        const estado = dto.estado ?? pedido.estado;
+        const direccion_envio = dto.direccion_envio ?? pedido.direccion_envio;
+    
+        const query = `UPDATE public.pedidos 
+                       SET usuario_id = $1, estado = $2, direccion_envio = $3 
+                       WHERE id = $4 RETURNING *;`;
+    
+        const values = [usuario_id, estado, direccion_envio, id];
+    
+        const result = await pool.query(query, values);
+    
+        return result.rows[0];
     }
+    
 }
