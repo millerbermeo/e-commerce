@@ -1,9 +1,9 @@
 import { pool } from "../database/conexion";
-import { PedidosDto } from "../dto/pedido.dto";
+import { PedidosDto, UpdatePedidosDto } from "../dto/pedido.dto";
 import { UpdateProductoDto } from "../dto/producto.dto";
 import { Pedido } from "../models/pedidos.interface";
-import { ItemsPedidosServices } from "./items-pedidos.services";
-import { ProductosServices } from "./productos.services";
+import { ItemsPedidosServices } from "./items-pedidos.service";
+import { ProductosServices } from "./productos.service";
 
 export class PedidosServices {
 
@@ -72,13 +72,76 @@ export class PedidosServices {
                     ...producto,
                     cantidad: Number(producto.cantidad) - Number(cantidad),
                 };
-                console.log('producto act',productoActualizado)
+                console.log('producto act', productoActualizado)
                 await this.productosServices.actualizarProducto(String(fk_producto), productoActualizado)
 
                 return queryItems
             })
         )
-        
+
+        return result.rows[0]
+    }
+
+
+    async listarPedidos(): Promise<Pedido[]> {
+        const query = `SELECT 
+            p.id, 
+            p.estado, 
+            p.total_pedido, 
+            p.direccion_envio,
+            u.id AS identificacion, 
+            u.nombre AS cliente, 
+            i.producto_id AS producto_id, 
+            pr.nombre AS producto_nombre 
+        FROM pedidos p
+        LEFT JOIN usuarios u ON p.usuario_id = u.id
+        LEFT JOIN items_pedidos i ON p.id = i.pedido_id
+        JOIN productos pr ON i.producto_id = pr.id;
+        ;`
+        const result = await pool.query(query)
+
+        const groupedOrders = result.rows.reduce<Pedido[]>((acc, item) => {
+            let order = acc.find((o) => o.id === item.id);
+
+            // Si no se encuentra un pedido, creamos uno nuevo
+            if (!order) {
+                order = { id: item.id, estado: item.estado, total_pedido: item.total_pedido, direccion_envio: item.direccion_envio, cliente: item.cliente, productos: [] };
+                acc.push(order);
+            }
+
+            // Ahora estamos seguros de que `order` no es `undefined`
+            order.productos.push(item.producto_nombre);
+
+            return acc;
+        }, []);
+
+        return groupedOrders;
+    }
+
+    async obtenerPedido(id: string): Promise<Pedido> {
+        const query = `SELECT * FROM public.pedidos WHERE id = $1;`
+        const result = await pool.query(query, [id])
+        return result.rows[0];
+    }
+
+
+    async actualizarPedido(id: string, dto: UpdatePedidosDto): Promise<Pedido> {
+
+        const { usuario_id, estado, direccion_envio } = dto;
+
+        const pedido = await this.obtenerPedido(id)
+
+        if (!pedido) {
+            throw new Error(`El pedido con ID ${id} no existe`);
+        }
+
+        const query = `UPDATE FROM public.pedidos SET usuario_id = $1, estado = $2, direccion_envio = $3
+        WHERE id = $4`
+
+        const values = [usuario_id, estado, direccion_envio, id]
+
+        const result = await pool.query(query, values)
+
         return result.rows[0]
     }
 }

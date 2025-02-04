@@ -34,7 +34,6 @@ export class ProductosServices {
 
         const { nombre, descripcion, precio, cantidad, categoria_id, imagen } = dto
 
-
         const producto = await this.obtenerProducto(id)
 
         if (!producto) {
@@ -52,13 +51,10 @@ export class ProductosServices {
         if (categoria_id !== undefined && isNaN(Number(categoria_id))) {
             throw new Error("Error: categoria_id no es un número válido.");
         }
-    
-
 
         const query = `UPDATE public.productos SET nombre = $1, descripcion = $2, precio = $3, cantidad = $4, categoria_id = $5, imagen = $6 WHERE id = $7 RETURNING *;`
         const values = [nombre, descripcion, precio, cantidad, categoria_id, imagen, id];
         const result = await pool.query(query, values);
-        console.log('reualtado',result)
 
         return result.rows[0];
     }

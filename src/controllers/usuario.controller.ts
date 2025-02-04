@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { UsuarioServices } from "../services/usuarios.services";
+import { UsuarioServices } from "../services/usuarios.service";
 import { CreateUsuarioDto, UpdateUsuarioDto } from "../dto/usuario.dto";
 
 export class UsuarioController {
