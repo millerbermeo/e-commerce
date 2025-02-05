@@ -7,6 +7,8 @@ import rutaUsuarios from './routes/usuario.routes';
 import authRouter from "./routes/auth.routes";
 import rutaProductos from './routes/productos.routes';
 import rutaPedidos from './routes/pedidos.routes';
+import rutaPagos from './routes/pago.routes';
+import rutaMetodosPago from './routes/metodos-pago.routes';
 
 
 const app = express();
@@ -30,6 +32,10 @@ app.use(authenticate);
 app.use('/api/usuarios', rutaUsuarios);
 app.use('/api/productos', rutaProductos);
 app.use('/api/pedidos', rutaPedidos);
+app.use('/api/pagos', rutaPagos);
+app.use('/api/metodos-pagos', rutaMetodosPago);
+
+
 
 
 (async () => {

@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { ProductosServices } from "../services/productos.service";
 import { PedidosServices } from "../services/pedidos.service";
 import { PedidosDto, UpdatePedidosDto } from "../dto/pedido.dto";
 
